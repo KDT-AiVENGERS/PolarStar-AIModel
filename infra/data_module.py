@@ -75,7 +75,7 @@ class HFBertDataModule(pl.LightningDataModule):
 
         self.sliding_window_interval = sliding_window_interval
 
-        self.masked_token_ratio = 0.15
+        self.masked_token_ratio = masked_token_ratio
 
     def prepare_data(self) -> None:
         # load predict data
@@ -200,8 +200,7 @@ class HFBertDataModule(pl.LightningDataModule):
 
         tensor2[:] = -100
         tensor2[masked_tokens] = tensor1[masked_tokens]
-        # tensor1[masked_tokens] = torch.where(token_types <= int(masking_ratio[0] * 100), self.tokenizer.mask_token_id, torch.where(token_types <= int((1 - masking_ratio[2]) * 100), torch.randint(0, self.tokenizer.vocab_size, (len(masked_tokens),)), tensor1[masked_tokens]))
-        tensor1[masked_tokens] = self.tokenizer.mask_token_id
+        tensor1[masked_tokens] = torch.where(token_types <= int(masking_ratio[0] * 100), self.tokenizer.mask_token_id, torch.where(token_types <= int((1 - masking_ratio[2]) * 100), torch.randint(0, self.tokenizer.vocab_size, (len(masked_tokens),)), tensor1[masked_tokens]))
 
     def train_dataloader(self) -> TRAIN_DATALOADERS:
         return DataLoader(self.train_dataset, batch_size=self.batch_size, collate_fn=self._collate_fn_train)
