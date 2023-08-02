@@ -89,12 +89,40 @@ def embedding_v_jds(v_jd_dict, target_columns = ['자격요건', '우대조건',
 
   return torch.stack(output_pooler)
 
-def generate_v_jd(answer: dict):
-  '''
-  input: 사용자의 대답 데이터 (dictionary)
-    예시: { 'personality': ['꼼꼼함', ...], ... }
-  output: 가상 jd 데이터 (dictionary)
-    예시: { '자격요건': '~~~', ... }
-  '''
+def generate_v_jd(QnA_answer: dict):
+  jd_dic = {'자격요건':'','우대조건':'','복지':'수습','회사소개':'','주요업무':''}
 
-  pass
+  for key, value in QnA_answer.items():
+        question = key
+        answer = ' '.join(value)
+
+        match question:
+            case 'personality':
+                jd_dic['자격요건'] = jd_dic['자격요건'] + answer +' '
+                jd_dic['회사소개'] = jd_dic['회사소개'] + answer +' '
+
+            case 'stack':
+                if len(answer) == 0:
+                    pass
+                
+                else:
+                    jd_dic['자격요건'] = jd_dic['자격요건'] + answer +' '
+                    jd_dic['우대조건'] = jd_dic['우대조건'] + answer +' '
+                    
+            #default '수습' in welfare
+            case 'welfare':
+                if '수습' not in answer:
+                    jd_dic['복지'] = answer
+                else:
+                    jd_dic['복지'] = jd_dic['복지'] + answer +' '
+
+            case 'job':
+                jd_dic['주요업무'] = jd_dic['주요업무'] + answer +' '
+
+
+            case 'domain':
+                jd_dic['회사소개'] = jd_dic['회사소개'] + answer +' '
+  
+  return jd_dic
+
+          
