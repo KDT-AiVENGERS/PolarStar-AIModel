@@ -12,4 +12,4 @@ def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격
     for col_idx in col_list:
         result.append(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0),origins[col_idx], dim=1))
 
-    return (sum(result)/3).argsort()[start:end]
+    return (sum(result)/len(col_list)).argsort()[start:end]
