@@ -1,7 +1,7 @@
 import torch
 
 # Modules About Hugging face
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, BertForMaskedLM
 
 import os
 import shutil
@@ -13,7 +13,7 @@ def get_models():
 
     return list(map(lambda x: x[:-3], pt_list))
 
-def generating_git_model(model_ref: str, model_name: str):
+def generating_jit_model(model_ref: str, model_name: str):
     tokenizer = AutoTokenizer.from_pretrained(model_ref)
 
     inputs = tokenizer([
@@ -22,24 +22,48 @@ def generating_git_model(model_ref: str, model_name: str):
     ], return_tensors='pt', padding=True, truncation=True)
 
     model = AutoModel.from_pretrained(model_ref, torchscript=True)
+    mlm_model = BertForMaskedLM.from_pretrained(model_ref)
+    model.pooler.dense = mlm_model.cls.predictions.transform.dense
 
     model_jit = torch.jit.trace(model, list(inputs.values()))
 
     model_jit.save(f'models/{model_name}.pt')
 
     # change state
-    with open('data/server_state.json', 'r') as fp:
-        server_state = json.load(fp)
+    if os.path.isfile('data/server_state.json'):
+        with open('data/server_state.json', 'r') as fp:
+            server_state = json.load(fp)
+    else:
+        server_state = {
+            'current_model_ref': '',
+            'model_refs': {},
+        }
 
-    server_state['current_model_ref'] = model_ref
+    server_state['model_refs'][model_name] = model_ref
 
     with open('data/server_state.json', 'w', encoding='utf-8') as fp:
-        json.dump(server_state, fp)
+        json.dump(server_state, fp, indent="\t", ensure_ascii=False)
 
 def set_model(model_name: str):
-    shutil.copy(f'models/{model_name}.pt', 'models/current_model.pt')
+    # change state file
+    if os.path.isfile('data/server_state.json'):
+        with open('data/server_state.json', 'r') as fp:
+            server_state = json.load(fp)
+    else:
+        server_state = {
+            'current_model_ref': '',
+            'model_refs': {},
+        }
+
+    model_ref = server_state['model_refs'].get(model_name)
+
+    if model_ref and os.path.isfile(f'models/{model_name}.pt'):
+        shutil.copy(f'models/{model_name}.pt', 'models/current_model.pt')
+        server_state['current_model_ref'] = model_ref
+        with open('data/server_state.json', 'w', encoding='utf-8') as fp:
+            json.dump(server_state, fp, indent="\t", ensure_ascii=False)
 
 def delete_model(model_name: str):
-    if os.isfile(f'models/{model_name}'):
-        os.remove(f'models/{model_name}')
+    if os.path.isfile(f'models/{model_name}.pt'):
+        os.remove(f'models/{model_name}.pt')
 
