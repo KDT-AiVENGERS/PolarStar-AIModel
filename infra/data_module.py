@@ -85,7 +85,6 @@ class HFBertDataModule(pl.LightningDataModule):
             print('No inference data available!')
 
         if self.predict_data_pd is not None and self.predict_target_cols:
-            self.predict_data_pd = self.predict_data_pd.sample(30) # for server test
             # serialize columns
             predict_data_serialized = []
             for row in range(len(self.predict_data_pd)):
