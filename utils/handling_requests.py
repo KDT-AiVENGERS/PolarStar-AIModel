@@ -1,19 +1,44 @@
 import torch
 
 import pandas as pd
+
+import os
 import json
+
+def server_initialize():
+    if not os.path.isdir('models'):
+        os.mkdir('models')
+
+    if not os.path.isdir('data'):
+        os.mkdir('data')
+
+    if not os.path.isfile('data/server_state.json'):
+        with open('data/server_state.json', 'w', encoding='utf-8') as fp:
+            json.dump({
+                'current_model_ref': '',
+                'model_refs': {},
+            }, fp, indent='\t', ensure_ascii=False)
+
+    if not os.path.isfile('data/v_jd_info.json'):
+        with open('data/v_jd_info.json', 'w', encoding='utf-8') as fp:
+            json.dump({}, fp, indent='\t', ensure_ascii=False)
 
 def get_recommended_jds(id, columns, start, end):
     target_columns = json.loads(columns)
+
+    if not os.path.isfile('data/jd_data.csv'):
+        return []
 
     jds_pd = pd.read_csv('data/jd_data.csv')
 
     vec_origin = torch.load('data/jd_embeddings.pth')
     vec_mock = torch.load('data/v_jd_embeddings.pth').get(id)
 
-    if vec_mock is not None:
-        recommends = find_matched_jds(vec_mock.squeeze(0), vec_origin, start, end, target_columns)
-        recommends_data = list(map(lambda x: jds_pd.loc[x].to_dict(), recommends.tolist()))
+    if vec_mock is None:
+        return []
+
+    recommends = find_matched_jds(vec_mock.squeeze(0), vec_origin, start, end, target_columns)
+    recommends_data = list(map(lambda x: jds_pd.loc[x].to_dict(), recommends.tolist()))
 
     return recommends_data
 
@@ -31,6 +56,12 @@ def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격
     return (sum(result)/len(col_list)).argsort()[start:end]
 
 def get_recommended_lectures(id, start, end):
+    if not os.path.isfile('data/jd_data.csv')\
+    or not os.path.isfile('data/udemy_data.csv')\
+    or not os.path.isfile('data/keywords_jds.csv')\
+    or not os.path.isfile('data/keywords_udemy.csv'):
+        return []
+
     jd_pd = pd.read_csv('data/jd_data.csv').loc[id]
     udemy_pd = pd.read_csv('data/udemy_data.csv')
     keyword_jds_pd = pd.read_csv('data/keywords_jds.csv')
