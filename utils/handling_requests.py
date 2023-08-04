@@ -37,10 +37,43 @@ def get_recommended_lectures(id, start, end):
     keyword_udemy_pd = pd.read_csv('data/keywords_udemy.csv')
 
     index_score_dict = find_matched_lectures(jd_pd, udemy_pd, keyword_jds_pd, keyword_udemy_pd)
-    index_sorted = list(sorted(index_score_dict.keys(), lambda x: index_score_dict[x]))
+    index_sorted = list(index_score_dict.keys())
 
     recommends_data = list(map(lambda x: udemy_pd.loc[x].to_dict(), index_sorted[start:end]))
     return recommends_data
 
 def find_matched_lectures(jd_pd, udemy_pd, keyword_jds_pd, keyword_udemy_pd):
-    pass
+    #공고의 문자열 병합 및 소문자화
+    string = jd_pd['자격요건'][0] + jd_pd['우대조건'][0] + jd_pd['주요업무'][0]
+    string = string.lower().replace(' ', '')
+
+    # udemy, 공고 사이에 겹치는 키워드를 추출하는 함수
+    def make_keywords(keyword_jds_pd, keyword_udemy_pd):
+        keywords = pd.merge(keyword_jds_pd, keyword_udemy_pd, on = '단어명', how = 'inner')['단어명'].values
+        
+        return keywords
+
+    keywords = make_keywords(keyword_jds_pd, keyword_udemy_pd)
+    
+    # 중복된 키워드 안에서 JD 안에 있는 keyword를 추출
+    k_list = []
+    for keyword in keywords:
+        if keyword in string:
+            k_list.append(keyword)
+
+    # 강의별로 keyword를 순회시키면서 해당 keyword가 몇개가 들어있는지 counting
+    n = len(udemy_pd)
+    Rec_dict = dict()
+    for idx in range(n):
+        Udemy_string = udemy_pd.loc[idx, '강의소개'] + udemy_pd.loc[idx, '강의명']
+        Udemy_string = Udemy_string.lower().replace(' ', '')
+        count = 0
+        
+        for key in k_list:
+            count += Udemy_string.count(key)
+            
+        Rec_dict[idx] = count
+    
+    Rec_dict = dict(sorted(Rec_dict.items(), key = lambda x: x[1], reverse = True))
+    
+    return Rec_dict
