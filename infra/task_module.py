@@ -118,7 +118,7 @@ class HFBertTask(pl.LightningModule):
 
         outputs = self.predict_model(**batch)
         # pooler_outputs = outputs['pooler_output'] # these are the sentence embedding vectors (768 dim each)
-        pooler_outputs = outputs[1] # for torchscript
+        pooler_outputs = outputs[0][:, 0] # for torchscript
         outputs_concated = []
         for i in range(int(len(pooler_outputs) / len(self.predict_target_cols))):
             outputs_concated.append(torch.concat(list(pooler_outputs[i * len(self.predict_target_cols):(i + 1) * len(self.predict_target_cols)])))

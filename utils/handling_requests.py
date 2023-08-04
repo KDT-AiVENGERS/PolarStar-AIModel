@@ -50,11 +50,11 @@ def find_matched_lectures(jd_pd, udemy_pd, keyword_jds_pd, keyword_udemy_pd):
     # udemy, 공고 사이에 겹치는 키워드를 추출하는 함수
     def make_keywords(keyword_jds_pd, keyword_udemy_pd):
         keywords = pd.merge(keyword_jds_pd, keyword_udemy_pd, on = '단어명', how = 'inner')['단어명'].values
-        
+
         return keywords
 
     keywords = make_keywords(keyword_jds_pd, keyword_udemy_pd)
-    
+
     # 중복된 키워드 안에서 JD 안에 있는 keyword를 추출
     k_list = []
     for keyword in keywords:
@@ -68,12 +68,12 @@ def find_matched_lectures(jd_pd, udemy_pd, keyword_jds_pd, keyword_udemy_pd):
         Udemy_string = udemy_pd.loc[idx, '강의소개'] + udemy_pd.loc[idx, '강의명']
         Udemy_string = Udemy_string.lower().replace(' ', '')
         count = 0
-        
+
         for key in k_list:
             count += Udemy_string.count(key)
-            
+
         Rec_dict[idx] = count
-    
+
     Rec_dict = dict(sorted(Rec_dict.items(), key = lambda x: x[1], reverse = True))
-    
+
     return Rec_dict
