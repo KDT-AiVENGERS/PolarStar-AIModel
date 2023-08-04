@@ -30,14 +30,8 @@ def generating_jit_model(model_ref: str, model_name: str):
     model_jit.save(f'models/{model_name}.pt')
 
     # change state
-    if os.path.isfile('data/server_state.json'):
-        with open('data/server_state.json', 'r') as fp:
-            server_state = json.load(fp)
-    else:
-        server_state = {
-            'current_model_ref': '',
-            'model_refs': {},
-        }
+    with open('data/server_state.json', 'r') as fp:
+        server_state = json.load(fp)
 
     server_state['model_refs'][model_name] = model_ref
 
@@ -46,14 +40,8 @@ def generating_jit_model(model_ref: str, model_name: str):
 
 def set_model(model_name: str):
     # change state file
-    if os.path.isfile('data/server_state.json'):
-        with open('data/server_state.json', 'r') as fp:
+    with open('data/server_state.json', 'r') as fp:
             server_state = json.load(fp)
-    else:
-        server_state = {
-            'current_model_ref': '',
-            'model_refs': {},
-        }
 
     model_ref = server_state['model_refs'].get(model_name)
 

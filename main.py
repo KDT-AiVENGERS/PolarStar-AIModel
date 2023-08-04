@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from utils.handling_models import get_models, generating_jit_model, set_model, delete_model
 from utils.handling_data import update_jd_data, get_v_jd_data, get_v_jds_data, create_v_jd_data, update_udemy_data, update_keywords_jds, update_keywords_udemy
-from utils.handling_requests import get_recommended_jds, get_recommended_lectures
+from utils.handling_requests import server_initialize, get_recommended_jds, get_recommended_lectures
 
 tags_metadata = [
     {
@@ -43,6 +43,15 @@ app = FastAPI(
 async def helloworld():
   return JSONResponse(
     content={"message": "Hello World"},
+    status_code=200,
+  )
+
+@app.get('/init')
+def initialize():
+  server_initialize()
+
+  return JSONResponse(
+    content={"message": "success"},
     status_code=200,
   )
 
