@@ -1,9 +1,10 @@
 import torch
-
+from collections import Counter
 import pandas as pd
 
 import os
 import json
+
 
 def server_initialize():
     if not os.path.isdir('models'):
@@ -22,6 +23,7 @@ def server_initialize():
     if not os.path.isfile('data/v_jd_info.json'):
         with open('data/v_jd_info.json', 'w', encoding='utf-8') as fp:
             json.dump({}, fp, indent='\t', ensure_ascii=False)
+
 
 def get_recommended_jds(id, columns, start, end):
     target_columns = json.loads(columns)
@@ -47,6 +49,7 @@ def get_recommended_jds(id, columns, start, end):
 
     return recommends_data, most_frequent_job, keyword_counts
 
+
 def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격요건', '우대조건', '복지', '회사소개', '주요업무']) -> list:
     result = []
     col_dic = {'자격요건':0,'우대조건':1,'복지':2,'회사소개':3,'주요업무':4}
@@ -60,8 +63,33 @@ def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격
 
     return (sum(result)/len(col_list)).argsort()[start:end]
 
+
 def statistics_extracting(recommends_data: list, tech_stack: dict) -> (str, dict):
-    pass
+
+    recommends_data = pd.DataFrame(recommends_data)
+    tech_li = []
+
+    recommends_data['직무내용'] = recommends_data['직무내용'].str.split(', ')
+    word_frequency = recommends_data['직무내용'].explode().value_counts()
+    max_frequency = word_frequency.max()
+    most_common_words = ', '.join(word_frequency[word_frequency == max_frequency].index)
+    
+    for words in recommends_data['자격요건'] + recommends_data['주요업무']:
+        for key, value in tech_stack.items():
+
+            if isinstance(value, list):
+                for tech in value:
+                    if tech in words.lower():
+                        tech_li.append(key)
+                        continue
+
+            elif value in words.lower():
+                tech_li.append(key)
+    
+    most_tech_words = dict(Counter(tech_li).most_common())
+    
+    return  tuple(most_common_words, most_tech_words)
+
 
 def get_recommended_lectures(id, start, end):
     if not os.path.isfile('data/jd_data.csv')\
@@ -80,6 +108,7 @@ def get_recommended_lectures(id, start, end):
 
     recommends_data = list(map(lambda x: udemy_pd.loc[x].to_dict(), index_sorted[start:end]))
     return recommends_data
+
 
 def find_matched_lectures(jd_pd, udemy_pd, keyword_jds_pd, keyword_udemy_pd):
     #공고의 문자열 병합 및 소문자화
