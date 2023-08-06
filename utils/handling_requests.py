@@ -40,7 +40,12 @@ def get_recommended_jds(id, columns, start, end):
     recommends = find_matched_jds(vec_mock.squeeze(0), vec_origin, start, end, target_columns)
     recommends_data = list(map(lambda x: jds_pd.loc[x].to_dict(), recommends.tolist()))
 
-    return recommends_data
+    with open('data/tech_stack.json', 'r') as fp:
+        tech_stack = json.load(fp)
+
+    most_frequent_job, keyword_counts = statistics_extracting(recommends_data, tech_stack)
+
+    return recommends_data, most_frequent_job, keyword_counts
 
 def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격요건', '우대조건', '복지', '회사소개', '주요업무']) -> list:
     result = []
@@ -54,6 +59,9 @@ def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격
         result.append(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0),origins[col_idx], dim=1))
 
     return (sum(result)/len(col_list)).argsort()[start:end]
+
+def statistics_extracting(recommends_data: list, tech_stack: dict) -> (str, dict):
+    pass
 
 def get_recommended_lectures(id, start, end):
     if not os.path.isfile('data/jd_data.csv')\
