@@ -51,7 +51,7 @@ def get_recommended_jds(id, columns, start, end):
 
 
 def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격요건', '우대조건', '복지', '회사소개', '주요업무']) -> list:
-    result = []
+    result_df = pd.DataFrame()
     col_dic = {'자격요건':0,'우대조건':1,'복지':2,'회사소개':3,'주요업무':4}
     col_list = [col_dic.get(col) for col in target_columns if col in col_dic]
 
@@ -59,9 +59,16 @@ def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격
     origins = torch.chunk(vec_origin, chunks=5, dim=1)
 
     for col_idx in col_list:
-        result.append(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0),origins[col_idx], dim=1))
+        if col_idx == 2  or col_idx == 3:
+            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0), origins[col_idx], dim=1).detach() / 2)
+        elif col_idx ==0 or col_idx ==1:
+            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0), origins[col_idx], dim=1).detach() * 2)
+        else:
+            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0), origins[col_idx], dim=1).detach() * 1.5)
 
-    return (sum(result)/len(col_list)).argsort()[start:end]
+    sorted_idx = result_df.mean(axis=1).sort_values(ascending=False)
+
+    return sorted_idx.index[start:end]
 
 
 def statistics_extracting(recommends_data: list, tech_stack: dict) -> (str, dict):
