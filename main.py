@@ -175,8 +175,26 @@ async def updatekeywordsudemy(file: UploadFile):
 
 @app.get('/find_jds/{v_jd_id}', tags=["Recommendation"])
 def get_rec_jds(v_jd_id: str, columns: str, start: int, end: int):
-  return get_recommended_jds(v_jd_id, columns, start, end)
+  recommends_data, most_frequent_job, keyword_counts = get_recommended_jds(v_jd_id, columns, start, end)
+  return JSONResponse(
+    content={
+      "message": "success",
+      "data": {
+        "jds": recommends_data,
+        "most_frequent_job": most_frequent_job,
+        "keyword_counts": keyword_counts,
+      },
+    },
+    status_code=200,
+  )
 
 @app.get('/find_lectures/{jd_id}', tags=["Recommendation"])
 def get_rec_lectures(jd_id: int, start: int, end: int):
-  return get_recommended_lectures(jd_id, start, end)
+  recommends_data = get_recommended_lectures(jd_id, start, end)
+  return JSONResponse(
+    content={
+      "message": "success",
+      "data": recommends_data,
+    },
+    status_code=200,
+  )
