@@ -119,17 +119,17 @@ def generate_v_jd(QnA_answer: dict):
                 for i in answer:
                         jd_dic['자격요건'] += (i + '능력을 가지고 계신분\n'
                                             )
-                        
+
                         jd_dic['우대조건'] += (i + '능력을 가지고 계신분\n'
                                             )
-                        
+
                         jd_dic['회사소개'] += (i + '문화를 가지고 있는 회사 입니다.\n'
                                            )
 
             case 'stack':
                 if len(answer) == 0:
                     pass
-                
+
                 else:
                     for i in answer:
                         jd_dic['자격요건'] += (i + '개발 경험이 있으신 분\n'
@@ -139,17 +139,17 @@ def generate_v_jd(QnA_answer: dict):
                                             + i + '에 관심이 있으신 분'
                                             + '기술스택: ' + ','.join(i)
                                             )
-                        
+
                         jd_dic['우대조건'] += (i + '사용에 능숙하신 분\n'
                                            + i + '개발 경험이 있으신 분\n'
                                            + i + '개발 경험'
                                            )
-                    
+
             #default '수습' in welfare
             case 'welfare':
                 if '수습' not in answer:
                     jd_dic['복지'] = ''
-                
+
                 if '장비' in answer:
                     jd_dic['복지'] += '필요한 장비지원\n장비 구매 지원\n'
 
@@ -158,7 +158,7 @@ def generate_v_jd(QnA_answer: dict):
 
                 if '출퇴근' in answer:
                      jd_dic['복지'] += '유연근무제를 시행중입니다.\n재택근무를 시행중\n'
-                
+
                 if '식사' in answer:
                      jd_dic['복지'] += '구내식당, 사내식당\n중/석식비 제공, 식사비 제공\n'
 
@@ -170,7 +170,7 @@ def generate_v_jd(QnA_answer: dict):
 
                 if '계발' in answer:
                      jd_dic['복지'] += '온라인강의 제공\n 도서, 시험지 제공\n자기계발비 지원'
-                    
+
 
             case 'job':
                 if len(answer) == 0:
@@ -181,10 +181,10 @@ def generate_v_jd(QnA_answer: dict):
                                             + i + '에 대한 지식을 보유하고 있는 분\n'
                                             + i + '관련 지식 보유\n'
                                             )
-                        
+
                         jd_dic['주요업무'] += (i + '관련 연구 및 개발\n'
                                            )
-                        
+
                         jd_dic['우대조건'] += (i + '관련 프로젝트 경험이 있는분\n'
                                             + i + '에 대한 지식을 보유하고 있는 분\n'
                                             + i + '관련 지식 보유\n'
@@ -192,20 +192,20 @@ def generate_v_jd(QnA_answer: dict):
 
 
             case 'domain':
-                
+
                 for i in answer:
                     jd_dic['회사소개'] += (i + '관련 프로젝트 경험이 있는분\n'
                                         + i + '에 대한 지식을 보유하고 있는 분\n'
                                         + i + '관련 지식 보유\n'
                                         )
-                    
+
                     jd_dic['우대조건'] += (i + '에 대한 지식을 보유하고 있는 분\n'
                                         + i + '관련 지식 보유\n'
                                         )
 
                     jd_dic['주요업무'] += (i + '관련 연구 및 개발\n'
                                            )
-  
+
   return jd_dic
 
 async def update_udemy_data(file):

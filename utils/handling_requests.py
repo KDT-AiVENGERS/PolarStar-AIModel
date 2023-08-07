@@ -60,11 +60,11 @@ def find_matched_jds(vec_mock, vec_origin, start, end, target_columns = ['자격
 
     for col_idx in col_list:
         if col_idx == 2  or col_idx == 3:
-            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0),origins[col_idx], dim=1)/2)
+            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0), origins[col_idx], dim=1).detach() / 2)
         elif col_idx ==0 or col_idx ==1:
-            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0),origins[col_idx], dim=1)*2)
+            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0), origins[col_idx], dim=1).detach() * 2)
         else:
-            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0),origins[col_idx], dim=1)*1.5)
+            result_df[col_idx] = pd.Series(torch.nn.functional.cosine_similarity(mocks[col_idx].unsqueeze(0), origins[col_idx], dim=1).detach() * 1.5)
 
     sorted_idx = result_df.mean(axis=1).sort_values(ascending=False)
 
