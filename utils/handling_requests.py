@@ -29,7 +29,7 @@ def get_recommended_jds(id, columns, start, end):
     target_columns = json.loads(columns)
 
     if not os.path.isfile('data/jd_data.csv'):
-        return []
+        return [], '', {}
 
     jds_pd = pd.read_csv('data/jd_data.csv')
 
@@ -37,7 +37,7 @@ def get_recommended_jds(id, columns, start, end):
     vec_mock = torch.load('data/v_jd_embeddings.pth').get(id)
 
     if vec_mock is None:
-        return []
+        return [], '', {}
 
     recommends = find_matched_jds(vec_mock.squeeze(0), vec_origin, start, end, target_columns)
     recommends_data = list(map(lambda x: jds_pd.loc[x].to_dict(), recommends.tolist()))
@@ -73,7 +73,7 @@ def statistics_extracting(recommends_data: list, tech_stack: dict) -> (str, dict
     word_frequency = recommends_data['직무내용'].explode().value_counts()
     max_frequency = word_frequency.max()
     most_common_words = ', '.join(word_frequency[word_frequency == max_frequency].index)
-    
+
     for words in recommends_data['자격요건'] + recommends_data['주요업무']:
         for key, value in tech_stack.items():
 
@@ -85,10 +85,10 @@ def statistics_extracting(recommends_data: list, tech_stack: dict) -> (str, dict
 
             elif value in words.lower():
                 tech_li.append(key)
-    
+
     most_tech_words = dict(Counter(tech_li).most_common())
-    
-    return  tuple(most_common_words, most_tech_words)
+
+    return  most_common_words, most_tech_words
 
 
 def get_recommended_lectures(id, start, end):
