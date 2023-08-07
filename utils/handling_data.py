@@ -222,3 +222,8 @@ async def update_keywords_udemy(file):
   content = await file.read()
   with open('data/keywords_udemy.csv', 'wb') as fp:
     fp.write(content)
+
+async def update_keywords_tech_stack(file):
+  content = await file.read()
+  with open('data/tech_stack.json', 'wb') as fp:
+    fp.write(content)

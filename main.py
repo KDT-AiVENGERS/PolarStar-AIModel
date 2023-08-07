@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 
 from utils.handling_models import get_models, generating_jit_model, set_model, delete_model
-from utils.handling_data import update_jd_data, get_v_jd_data, get_v_jds_data, create_v_jd_data, update_udemy_data, update_keywords_jds, update_keywords_udemy
+from utils.handling_data import update_jd_data, get_v_jd_data, get_v_jds_data, create_v_jd_data, update_udemy_data, update_keywords_jds, update_keywords_udemy, update_keywords_tech_stack
 from utils.handling_requests import server_initialize, get_recommended_jds, get_recommended_lectures
 
 tags_metadata = [
@@ -48,10 +48,13 @@ async def helloworld():
 
 @app.get('/init')
 def initialize():
-  server_initialize()
+  checkFile = server_initialize()
 
   return JSONResponse(
-    content={"message": "success"},
+    content={
+      "message": "success",
+      "data": checkFile
+    },
     status_code=200,
   )
 
@@ -167,6 +170,15 @@ async def updatekeywordsjds(file: UploadFile):
 @app.put('/key_udemy', tags=["Keywords Database"])
 async def updatekeywordsudemy(file: UploadFile):
   await update_keywords_udemy(file)
+
+  return JSONResponse(
+    content={"message": "success"},
+    status_code=200,
+  )
+
+@app.put('/key_tech_stack', tags=["Keywords Database"])
+async def updatekeywordstechstack(file: UploadFile):
+  await update_keywords_tech_stack(file)
 
   return JSONResponse(
     content={"message": "success"},

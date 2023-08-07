@@ -24,6 +24,34 @@ def server_initialize():
         with open('data/v_jd_info.json', 'w', encoding='utf-8') as fp:
             json.dump({}, fp, indent='\t', ensure_ascii=False)
 
+    checkFile = {}
+
+    if os.path.isfile('data/jd_data.csv'):
+        checkFile['jd_data.csv'] = 'ok'
+    else:
+        checkFile['jd_data.csv'] = 'empty'
+
+    if os.path.isfile('data/udemy_data.csv'):
+        checkFile['udemy_data.csv'] = 'ok'
+    else:
+        checkFile['udemy_data.csv'] = 'empty'
+
+    if os.path.isfile('data/keywords_jds.csv'):
+        checkFile['keywords_jds.csv'] = 'ok'
+    else:
+        checkFile['keywords_jds.csv'] = 'empty'
+
+    if os.path.isfile('data/keywords_udemy.csv'):
+        checkFile['keywords_udemy.csv'] = 'ok'
+    else:
+        checkFile['keywords_udemy.csv'] = 'empty'
+
+    if os.path.isfile('data/tech_stack.json'):
+        checkFile['tech_stack.json'] = 'ok'
+    else:
+        checkFile['tech_stack.json'] = 'empty'
+
+    return checkFile
 
 def get_recommended_jds(id, columns, start, end):
     target_columns = json.loads(columns)
