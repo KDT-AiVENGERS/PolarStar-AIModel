@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from utils.handling_models import get_models, generating_jit_model, set_model, delete_model
 from utils.handling_data import update_jd_data, get_v_jd_data, get_v_jds_data, create_v_jd_data, update_udemy_data, update_keywords_jds, update_keywords_udemy, update_keywords_tech_stack
@@ -32,11 +33,23 @@ tags_metadata = [
     },
 ]
 
+origins = [
+    "*",
+]
+
 app = FastAPI(
   title="북극성",
   summary="길을 잃지 않도록 환히 빛나고 있습니다.",
   version="1.0.0",
   openapi_tags=tags_metadata
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get('/')
