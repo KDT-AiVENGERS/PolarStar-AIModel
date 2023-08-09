@@ -147,7 +147,7 @@ def get_recommended_lectures(id, start, end):
 
 def find_matched_lectures(jd_pd, udemy_pd, keyword_jds_pd, keyword_udemy_pd):
     #공고의 문자열 병합 및 소문자화
-    string = jd_pd['자격요건'][0] + jd_pd['우대조건'][0] + jd_pd['주요업무'][0]
+    string = jd_pd['자격요건'] + jd_pd['우대조건'] + jd_pd['주요업무']
     string = string.lower().replace(' ', '')
 
     # udemy, 공고 사이에 겹치는 키워드를 추출하는 함수
