@@ -1,6 +1,6 @@
 # Model Server
 
-[북극성 통합 repository 바로가기](https://github.com/KDT-AiVENGERS/.github/tree/develop/profile/polarstar)
+[북극성 서비스 정보 바로가기](https://github.com/KDT-AiVENGERS/PolarStar_Info)
 
 Model Server 저장소는 북극성 프로젝트의 인공지능 모델을 서빙하기 위한 서버입니다. 본 서버에는 공고 추천 서비스를 위한 추론용 BERT 모델과, 커리큘럼 추천 서비스를 위한 알고리즘이 구현되어 있습니다. Browser (client) 에서 사용자 질의 사항에 대한 정보가 전송되면, 이를 토대로 encoded vector 를 추론하여 저장한 후, 미리 저장되어 있던 공고들의 vector 와 비교하여 추천 공고 정보를 내보냅니다.
 
